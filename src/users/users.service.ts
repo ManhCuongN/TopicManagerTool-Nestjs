@@ -33,6 +33,14 @@ export class UsersService {
                 }
               }
               
+              async findAll() {
+                try {
+                  return await this.userRepo.find()
+                } catch (error) {
+                  throw new InternalServerErrorException('Error when fetching user by googleId');
+                  
+                }
+              }
               
 
 

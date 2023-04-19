@@ -8,9 +8,11 @@ import { JwtModule } from 'src/jwt/jwt.module';
 import { UsersService } from 'src/users/users.service';
 import { JwtMiddleware } from 'src/guards/get-user.decorator';
 import { User } from 'src/entities/users.entity';
+import { Request } from 'src/entities/request.entity';
+import { UsersModule } from 'src/users/users.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Subject, User]), EventModule, JwtModule],
+  imports: [TypeOrmModule.forFeature([Subject, User, Request]), EventModule, JwtModule, UsersModule],
   providers: [SubjectService, UsersService],
   controllers: [SubjectController],
   exports: [SubjectService]

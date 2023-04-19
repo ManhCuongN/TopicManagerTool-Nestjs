@@ -1,4 +1,4 @@
-import { Body, Controller, HttpStatus, Inject, Param, Post, Put, Req, Res, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Get, HttpStatus, Inject, Param, Post, Put, Req, Res, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { SubjectService } from './subject.service';
 import { Roles } from 'src/guards/role.decorator';
 import { Role } from 'src/constant/roleCode';
@@ -38,6 +38,19 @@ export class SubjectController {
             const result = await this.subjectService.update(id, updateSubject,currentUser)
             return res.status(200).json({message:"Updated Subject Successfully"})
             
+         } catch (error) {
+            return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Something went wrong' })
+         }
+        
+    }
+
+    @Get('/get/genaral/info/:id')
+    @UseGuards(RolesGuard)
+    @Roles(Role.STUDENT)
+    async getGenaralInfo(@Param('id') id: number, @Req() req, @Res() res) {
+         try {   
+            const result =  await this.subjectService.getGenaralInfo(id)
+            return res.status(200).json({data: result})         
          } catch (error) {
             return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Something went wrong' })
          }

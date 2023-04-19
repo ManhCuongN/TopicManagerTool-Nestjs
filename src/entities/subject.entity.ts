@@ -49,6 +49,9 @@ export class Subject extends Base{
 
     @OneToMany(() => Topic, (topic) => topic.idSubject, { cascade: true })
     topics: Topic[]
+
+    @OneToMany(() => Request, (request) => request.idSubject)
+    requests: Request[]
     
 
 }

@@ -7,7 +7,7 @@ import { STATUS } from 'src/constant/httpCode';
 import { Role } from 'src/constant/roleCode';
 import { DepartmentService } from 'src/department/department.service';
 import { Department } from 'src/entities/department.entity';
-import { GroupsUsers } from 'src/entities/group-user.entity';
+
 import { Request } from 'src/entities/request.entity';
 import { Topic } from 'src/entities/topic.entity';
 import { User } from 'src/entities/users.entity';
@@ -80,7 +80,7 @@ export class TopicService {
           const subject = await this.subjectService.findByIdSubject(newTopic.idSubject);
           let request = new Request()
           request.idTopic = newTopic
-          request.idGroup = idGroup;
+          request.idGroups = idGroup;
           request.scheduledVersion = subject.scheduledVersion;
           request.plan = "";
           request.status = STATUS.APPROVED

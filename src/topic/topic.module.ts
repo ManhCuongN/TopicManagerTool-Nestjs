@@ -8,7 +8,6 @@ import { JwtModule } from 'src/jwt/jwt.module';
 import { JwtMiddleware } from 'src/guards/get-user.decorator';
 import { SubjectModule } from 'src/subject/subject.module';
 import { Request } from 'src/entities/request.entity';
-import { GroupsUsers } from 'src/entities/group-user.entity';
 import { EventModule } from 'src/event/event.module';
 import { DepartmentModule } from 'src/department/department.module';
 import { UsersService } from 'src/users/users.service';
@@ -16,7 +15,7 @@ import { UsersService } from 'src/users/users.service';
 
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Topic, User, Request, GroupsUsers]), JwtModule, SubjectModule, EventModule, DepartmentModule],
+  imports: [TypeOrmModule.forFeature([Topic, User, Request]), JwtModule, SubjectModule, EventModule, DepartmentModule],
   providers: [TopicService, UsersService],
   controllers: [TopicController]
 })

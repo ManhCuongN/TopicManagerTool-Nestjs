@@ -2,15 +2,21 @@ import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EVENT_CONSTANTS } from 'src/constant/eventConstant';
 import { EVENT_TYPE } from 'src/constant/eventType';
+import { STATUS } from 'src/constant/httpCode';
+import { Request } from 'src/entities/request.entity';
 import { Subject } from 'src/entities/subject.entity';
+import { User } from 'src/entities/users.entity';
 import { EventService } from 'src/event/event.service';
+import { UsersService } from 'src/users/users.service';
 import { Repository } from 'typeorm';
 
 @Injectable()
 export class SubjectService {
 
     constructor(@InjectRepository(Subject) private subjectRepo: Repository<Subject>,
-                 @Inject(EventService) private eventService: EventService) {}
+                 @Inject(EventService) private eventService: EventService,
+                 @Inject(UsersService) private userService: UsersService,
+                 @InjectRepository(Request) private requestRepo: Repository<Request>) {}
 
     async findByIdSubject(idSubject) {
          return await this.subjectRepo.findOneBy({
@@ -54,5 +60,66 @@ export class SubjectService {
             
         }
 
+    }
+
+    async getGenaralInfo(idSubject) {
+        try {
+            if(idSubject && idSubject != "") {
+                let data = []
+                const requests = await this.requestRepo
+                .createQueryBuilder("request")
+                .leftJoinAndSelect("request.idTopic", "topic")
+                .leftJoinAndSelect("topic.idTeacher", "teacher")
+                .leftJoinAndSelect("request.idSubject", "subject")
+                .leftJoinAndSelect("request.idGroups", "group")
+                .leftJoinAndSelect("group.users", "user")
+                .where("request.idSubject = :idSubject", { idSubject: idSubject })
+                .andWhere("request.status = :status", { status: STATUS.APPROVED })
+                .getMany();
+               
+                if(requests != null) {
+                    let index = 1;
+                    const listUser = await this.userService.findAll();
+                                     
+                    requests.forEach((ele) => {
+                    const object = {}
+                    object['STT'] = index;
+                    object["Mã đề tài"] = ele.idTopic.code;
+                    object["Tên đề tài"] = ele.idTopic.title;
+                    object["Đợt đăng kí"] = ele.scheduledVersion;
+                    object["Ghi chú"] = ele.note;
+                    object["Mã đề tài"] = ele.idTopic.code;
+                    let teacherNames = [];
+
+                    for (let i = 0; i < listUser.length; i++) {
+                      if (listUser[i]['googleId'] === ele.idTopic.idTeacher.googleId) {
+                        const givenName = listUser[i]['givenName'];
+                        const familyName = listUser[i]['familyName'];
+                        const teacherName = `${givenName} ${familyName}`;
+                        teacherNames.push(teacherName);
+                        
+                      }
+                    }
+                    object["Giảng viên"] = teacherNames;
+                    const students = ele.idGroups.users;
+                    for (let i = 0; i < students.length; i++) {
+                        const name = `Họ và tên sinh viên ${i + 1}`;
+                        const mssv = `MSSV (SV ${i + 1})`;
+                        object[name] = `${students[i].givenName}  ${students[i].familyName} `;
+                        object[mssv] = students[i].email.split("@")[0];
+                      }
+                    data.push(object);
+                    index++;
+                   }) 
+                }  
+                return data;           
+            } else {
+                throw new HttpException('Request Not Found', HttpStatus.BAD_REQUEST);
+            }
+          
+        } catch (error) {
+            console.log(error);
+            throw new HttpException('Internal Server Error', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

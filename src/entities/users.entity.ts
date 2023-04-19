@@ -1,4 +1,4 @@
-import { Entity,OneToMany,PrimaryColumn,Column, OneToOne, JoinColumn, BaseEntity, CreateDateColumn, DeleteDateColumn, UpdateDateColumn, ManyToMany } from "typeorm"
+import { Entity,OneToMany,PrimaryColumn,Column, OneToOne, JoinColumn, BaseEntity, CreateDateColumn, DeleteDateColumn, UpdateDateColumn, ManyToMany, ManyToOne } from "typeorm"
 
 import { Department } from "./department.entity";
 import { Subject } from "./subject.entity";
@@ -54,8 +54,9 @@ export class User extends Base {
     @OneToMany(() => Topic, (topic) => topic.idTeacher)
     idTeacherTopics: Topic[]
     
-    @OneToMany(() => Group, group => group.users)
-    groups: Group[];
+    @ManyToOne(() => Group, (group) => group.users)
+    @JoinColumn({ name: "groupId" })
+     group: Group;
    
     @Optional()
     @OneToMany(() => Event, event => event.idUser)
