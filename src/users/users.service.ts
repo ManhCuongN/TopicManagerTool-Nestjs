@@ -26,8 +26,16 @@ export class UsersService {
 
               async findOne(googleId) {
                 try {
-                  return await this.userRepo.findOneBy(googleId)
+                 
+                   const user =  await this.userRepo.findOneByOrFail(googleId);
+                 
+                   
+                   return user;
+                   
+
                 } catch (error) {
+                    console.log(error);
+                    
                   throw new InternalServerErrorException('Error when fetching user by googleId');
                   
                 }
@@ -41,11 +49,25 @@ export class UsersService {
                   
                 }
               }
+
+              async findByEmail(email: string): Promise<User> {
+                const lowerEmail = email.toLowerCase();
+                return this.userRepo.findOne({
+                  where: { email: lowerEmail }
+                });
+              }
+              
+              async findStudentsByIdSubject(id: number): Promise<User[]> {
+                return this.userRepo.createQueryBuilder('user')
+                  .leftJoin('user.studentSub', 'subject')
+                  .where('subject.codeSubject = :id', { id })
+                  .getMany();
+              }
               
 
 
     
-    //google authentication
+    //google authenticationTypeError: emails is not iterable
     async googleAuthentication(params) {
       try {
         const {googleId, isCreated} = params

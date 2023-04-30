@@ -30,6 +30,4 @@ export class Event extends Base{
       @JoinColumn({name: "idUser"})
       idUser: User;
    
-
-     
 }

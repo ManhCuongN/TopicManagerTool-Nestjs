@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { log } from 'console';
 import { EVENT_CONSTANTS } from 'src/constant/eventConstant';
 import { EVENT_TYPE } from 'src/constant/eventType';
 import { STATUS } from 'src/constant/httpCode';
@@ -7,6 +8,7 @@ import { Request } from 'src/entities/request.entity';
 import { Subject } from 'src/entities/subject.entity';
 import { User } from 'src/entities/users.entity';
 import { EventService } from 'src/event/event.service';
+import { SubjectQueueService } from 'src/subject-queue/subject-queue.service';
 import { UsersService } from 'src/users/users.service';
 import { Repository } from 'typeorm';
 
@@ -16,6 +18,7 @@ export class SubjectService {
     constructor(@InjectRepository(Subject) private subjectRepo: Repository<Subject>,
                  @Inject(EventService) private eventService: EventService,
                  @Inject(UsersService) private userService: UsersService,
+                 @Inject(SubjectQueueService) private subjectQueueService: SubjectQueueService,
                  @InjectRepository(Request) private requestRepo: Repository<Request>) {}
 
     async findByIdSubject(idSubject) {
@@ -120,6 +123,118 @@ export class SubjectService {
         } catch (error) {
             console.log(error);
             throw new HttpException('Internal Server Error', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    async createSchelude(id, createSchBody, currentUser) {
+        const {from, to, idUsers, emails} = createSchBody;
+        try {
+            await this.subjectRepo.createQueryBuilder()
+            .update(Subject)
+            .set({
+              from : new Date(from),
+              to: new Date(to),
+              students: idUsers,
+              isScheduled: true
+            })
+            .where("codeSubject = :id", {id})
+            .execute()
+
+        const subject = await this.subjectRepo.findOne({
+              where: { codeSubject: id },
+              relations: ['students'],
+            });
+            
+        const emailStudent = subject.students.map((student) => student.email)
+
+
+        let numQueue = 0; 
+        for (let i = 0; i < emails.length; i++) {
+        const user = await this.userService.findByEmail(emails[i])
+
+        if(user) {
+           
+            
+          if(emailStudent.indexOf(user.email) == -1) {
+             subject.students.push(user)
+             } else {            
+                    numQueue++;
+                    const newSubjectQueue = {
+                        idSubject: id,
+                        email: emails[i].toLowerCase(),
+                        from: new Date(from),
+                        to: new Date(to),
+                    }
+                 await this.subjectQueueService.createSubjectQueue(newSubjectQueue)
+    
+            } 
+        } 
+}
+         subject.totalInvitation = subject.students.length + numQueue; 
+         await this.subjectRepo.save({ id, totalInvitation: subject.totalInvitation });      
+         
+         await this.eventService.createEvent(
+            id,
+            currentUser.googleId,
+            EVENT_TYPE.CREATE_EVENT,
+            `${EVENT_CONSTANTS.CREATE_SCHEDULE} (${subject.title})`
+         )
+
+         subject.students.forEach(async(ele) => {
+            await this.eventService.createEvent(
+                id,
+                ele.googleId,
+                EVENT_TYPE.CREATE_EVENT,
+                `${EVENT_CONSTANTS.INVITE_SUBJECT} (${subject.title})`
+            )
+         })
+    
+        } catch (error) {
+            
+        }                                         
+    }
+
+    async addStudentsToSubject(idSubject, body, currentUser, next) {
+        try {
+            const {idUsers} = body
+            
+           // const subject =  await this.subjectRepo.findOneBy({codeSubject: idSubject})
+           const subject = await this.subjectRepo.createQueryBuilder('subject')
+           .leftJoinAndSelect('subject.students', 'students')
+           .where('subject.codeSubject = :id', { id: idSubject })
+           .getOne();
+                      
+        //    return
+        for (const index in idUsers) {
+            const googleId = idUsers[index];
+            const user = await this.userService.findOne({googleId});         
+            subject.students.push(user);
+          }
+            
+        
+            subject.totalInvitation += idUsers.length;
+           
+           
+            
+            await this.subjectRepo.save(subject);
+            await this.eventService.createEvent(
+                idSubject,
+                currentUser.googleId,
+                EVENT_TYPE.UPDATE_EVENT,
+                `${EVENT_CONSTANTS.UPDATE_SUBJECT} (${subject.title})`
+            )
+
+            idUsers.forEach(async (idUser) => {
+                await this.eventService.createEvent(
+                    idSubject,
+                    idUser,
+                    EVENT_TYPE.UPDATE_EVENT,
+                    `${EVENT_CONSTANTS.UPDATE_SUBJECT} (${subject.title})`
+                )
+            })
+        } catch (error) {
+            console.log(error);
+            next(error)
         }
     }
 }

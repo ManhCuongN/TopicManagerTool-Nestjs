@@ -5,6 +5,7 @@ import { User } from "./users.entity";
 import { Request } from "./request.entity";
 import { Topic } from "./topic.entity";
 import { Base } from "./base.entity";
+import { SubjectQueue } from "./subjectqueue.entity";
 
 
 
@@ -43,15 +44,17 @@ export class Subject extends Base{
     @JoinColumn({ name: "idUser" })
     idUser: User
 
-    @ManyToOne(() => User, (user) => user.studentSub, { cascade: true })
-    @JoinColumn({ name: "students" })
-    students: User
+    @OneToMany(() => User, (user) => user.codeSubject, { cascade: true })
+    students: User[]
 
     @OneToMany(() => Topic, (topic) => topic.idSubject, { cascade: true })
     topics: Topic[]
 
     @OneToMany(() => Request, (request) => request.idSubject)
     requests: Request[]
+
+    @OneToMany(() => SubjectQueue, (subQueue) => subQueue.idSubject, {cascade: true})
+    subjectqueue: SubjectQueue[]
     
 
 }

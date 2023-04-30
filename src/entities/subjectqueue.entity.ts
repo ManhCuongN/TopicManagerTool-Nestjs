@@ -1,5 +1,6 @@
-import { BaseEntity, Column, CreateDateColumn, DeleteDateColumn, Entity, PrimaryColumn, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { BaseEntity, Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, ManyToOne, PrimaryColumn, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Base } from "./base.entity";
+import { Subject } from "./subject.entity";
 
 
 
@@ -8,8 +9,9 @@ export class SubjectQueue extends Base {
     @PrimaryGeneratedColumn()
     idSubjectQueue: number
 
-    @Column()
-    idSubject: number
+    @ManyToOne(() => Subject, (subject) => subject.subjectqueue)
+    @JoinColumn({ name: "idSubject" })
+    idSubject: Subject
 
     @Column()
     email: string

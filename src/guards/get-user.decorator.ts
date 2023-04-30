@@ -17,7 +17,11 @@ export class JwtMiddleware implements NestMiddleware {
       const token = authHeader.split(' ')[1];
       try {
         const decoded = this.jwtService.decodeToken(token);
+        
+        
         const user = await this.userService.findOne({googleId: decoded.sub}) 
+        
+        
         req['user'] = user; // thêm thông tin user vào request
       } catch (error) {
         // Xử lý lỗi khi token không hợp lệ

@@ -45,8 +45,9 @@ export class User extends Base {
     @OneToMany(() => Subject, (subject) => subject.idUser)
     subjects: Subject[]
 
-    @OneToMany(() => Subject, (subject) => subject.students)
-    studentSub: Subject[]
+    @ManyToOne(() => Subject, (subject) => subject.students)
+    @JoinColumn({ name: "codeSubject" })
+    codeSubject: Subject
 
     @OneToMany(() => Topic, (topic) => topic.createdBy)
     createdByTopics: Topic[]

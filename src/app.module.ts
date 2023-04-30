@@ -13,6 +13,8 @@ import { AuthModule } from './auth/auth.module';
 import { SubjectModule } from './subject/subject.module';
 import { EventModule } from './event/event.module';
 import { DepartmentModule } from './department/department.module';
+import { SubjectQueueModule } from './subject-queue/subject-queue.module';
+import { GroupModule } from './group/group.module';
 
 
 @Module({
@@ -26,7 +28,9 @@ import { DepartmentModule } from './department/department.module';
     AppModule,
     SubjectModule,
     EventModule,
-    DepartmentModule
+    DepartmentModule,
+    SubjectQueueModule,
+    GroupModule
 
   ],
 })

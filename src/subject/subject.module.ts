@@ -10,9 +10,10 @@ import { JwtMiddleware } from 'src/guards/get-user.decorator';
 import { User } from 'src/entities/users.entity';
 import { Request } from 'src/entities/request.entity';
 import { UsersModule } from 'src/users/users.module';
+import { SubjectQueueModule } from 'src/subject-queue/subject-queue.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Subject, User, Request]), EventModule, JwtModule, UsersModule],
+  imports: [TypeOrmModule.forFeature([Subject, User, Request]), EventModule, JwtModule, UsersModule, SubjectQueueModule],
   providers: [SubjectService, UsersService],
   controllers: [SubjectController],
   exports: [SubjectService]
