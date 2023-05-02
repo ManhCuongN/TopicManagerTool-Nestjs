@@ -67,7 +67,7 @@ export class GroupService {
                 EVENT_CONSTANTS.UPDATE_GROUP
             )
             
-           userOfGroup.users.forEach((user) => {
+           userOfGroup.users.forEach(async (user) => {
               if(user.googleId != currentUser.googleId) {
                 await this.eventService.createEvent(
                     idGroup,
@@ -80,6 +80,21 @@ export class GroupService {
              
            })
             
+        } catch (error) {
+            
+        }
+    }
+
+    async getUserOfGroup(idGroup) {
+        try {
+            console.log(idGroup);
+            
+            const userOfGroup = await this.groupRepo.createQueryBuilder('group')
+            .leftJoinAndSelect('group.users', 'userTable')
+            .where('userTable.groupId = :id', { id: idGroup })
+            .getOne();
+
+            return userOfGroup
         } catch (error) {
             
         }

@@ -13,7 +13,7 @@ import { EventModule } from 'src/event/event.module';
   imports: [TypeOrmModule.forFeature([Group, User]), JwtModule, EventModule],
   providers: [GroupService, UsersService],
   controllers: [GroupController],
-  exports: [GroupModule]
+  exports: [GroupModule, GroupService]
 })
 export class GroupModule {
   configure(consumer: MiddlewareConsumer) {

@@ -18,7 +18,7 @@ export class TopicController {
     @Get()
     @UsePipes(new ValidationPipe())
     @UseGuards(RolesGuard)
-    @Roles(Role.STUDENT)
+    @Roles(Role.ROLE_DEAN, Role.ROLE_TEACHER, Role.ROLE_HD)
     async createTopic(@Body() createTopic: CreateTopicDto, @Res() res, @Req() req) {
        const userCurrent = req.user  
        const newTopic = await this.topicService.create(createTopic, userCurrent)   
@@ -31,7 +31,7 @@ export class TopicController {
         transform: true,
     }))
     @UseGuards(RolesGuard)
-    @Roles(Role.STUDENT)
+    @Roles(Role.ROLE_DEAN, Role.ROLE_TEACHER, Role.ROLE_MANAGER, Role.ROLE_HD)
     async updateTopic(@Param('id') id: string, @Body() updateTopic: UpdateTopicDto, @Res() res: Response) {  
        
         try {
@@ -46,7 +46,7 @@ export class TopicController {
 
     @Patch('/status/:id')
     @UseGuards(RolesGuard)
-    @Roles(Role.STUDENT)
+    @Roles(Role.ROLE_DEAN, Role.ROLE_HD)
     async updateStatusTopic(@Param('id') id: string, @Body() status: Boolean, @Res() res: Response, @Req() req) {  
       
         try {
@@ -61,7 +61,7 @@ export class TopicController {
 
     @Post('/add/note/:id')
     @UseGuards(RolesGuard)
-    @Roles(Role.STUDENT)
+    @Roles(Role.ROLE_DEAN, Role.ROLE_HD)
     async addNote(@Param('id') id: string, @Body() note: string, @Req() req, @Res() res){
         try {
             const currentUser = req.user

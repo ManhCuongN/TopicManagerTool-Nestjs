@@ -12,8 +12,6 @@ export class GroupController {
 
     @Post("/create")
     @UsePipes(new ValidationPipe())
-    @UseGuards(RolesGuard)
-    @Roles(Role.STUDENT)
     async createGroup(@Body() createGroup: CreateGroupDto, @Res() res, @Req() req, @Next() next ) {
         try {
             const currentUser = req.user
@@ -25,8 +23,6 @@ export class GroupController {
     }
 
     @Put("/update/:id")
-    @UseGuards(RolesGuard)
-    @Roles(Role.STUDENT)
     async updateGroup(@Body() updateGroup, @Param('id') idGroup: number,  @Res() res, @Req() req, @Next() next ) {
         try {
             const currentUser = req.user

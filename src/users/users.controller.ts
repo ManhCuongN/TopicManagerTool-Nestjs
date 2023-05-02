@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Req, Res, UseGuards, Next, Session } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, Res, UseGuards, Next, Session, Param } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { NextFunction, Response } from 'express';
 import { Role } from 'src/constant/roleCode';
@@ -9,15 +9,12 @@ import {
     HTTP_CREATED_STATUS,
   } from '../constant/httpCode';
 import {UsersService} from './users.service'
+import { RolesGuard } from 'src/guards/google.guard';
 
 @Controller()
 export class UsersController {
 
-    constructor(
-       private usersService: UsersService
-    ) {}
-
-    
+    constructor(private usersService: UsersService) {}
 
     @Get('/google')
     @UseGuards(AuthGuard('google'))
@@ -38,14 +35,17 @@ export class UsersController {
          
     }
    
-    // @Get('/test')
-    // @UseGuards(RolesGuard)
-    // @Roles(Role.STUDENT)
-    // test() {
-    //   console.log('session.token');
-    // }
+    @Get('/add/role')
+    @UseGuards(RolesGuard)
+    @Roles(Role.ROLE_ADMIN)
+    async addRole(@Param("id") idUser: string, @Body() role: string, @Res() res, @Next() next) {
+      try {
+        await this.usersService.addRole(idUser, role)
+        return res.status(200).json({message: "Add Role New Successfully"})
+      } catch (error) {
+        console.log(error);
+        next(error)
+      }
+    }
   
-    
-   
-
 }

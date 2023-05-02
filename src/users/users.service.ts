@@ -87,14 +87,19 @@ export class UsersService {
       
     }
 
-   
-
-    async createUser(newUser) {
-      await this.userRepo
-    .createQueryBuilder()
-    .insert()
-    .into(User)
-    .values(newUser)
-    .execute()
+    async addRole(idUser, role) {
+        try {
+            await this.userRepo.createQueryBuilder()
+                               .update(User)
+                               .set({role})
+                               .where("googleId = :idUser",{idUser})
+                               .execute()
+        } catch (error) {
+            console.log(error);          
+        }
     }
+
+    
+    
+
 }

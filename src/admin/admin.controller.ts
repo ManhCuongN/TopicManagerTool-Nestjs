@@ -5,11 +5,7 @@ import { AdminService } from './admin.service';
 @Controller('admin')
 export class AdminController {
     
-    constructor(
-        @Inject(AdminService) private adminService: AdminService
-    ){}
-
-    
+    constructor( @Inject(AdminService) private adminService: AdminService){}
     @Post()
     login(@Body() body: string) {
         return this.adminService.login(body)

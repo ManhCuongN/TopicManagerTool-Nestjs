@@ -17,7 +17,8 @@ import { UsersService } from 'src/users/users.service';
 @Module({
   imports: [TypeOrmModule.forFeature([Topic, User, Request]), JwtModule, SubjectModule, EventModule, DepartmentModule],
   providers: [TopicService, UsersService],
-  controllers: [TopicController]
+  controllers: [TopicController],
+  exports: [TopicService]
 })
 export class TopicModule {
   configure(consumer: MiddlewareConsumer) {

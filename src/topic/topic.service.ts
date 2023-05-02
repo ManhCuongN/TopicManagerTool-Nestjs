@@ -9,6 +9,7 @@ import { DepartmentService } from 'src/department/department.service';
 import { Department } from 'src/entities/department.entity';
 
 import { Request } from 'src/entities/request.entity';
+import { Subject } from 'src/entities/subject.entity';
 import { Topic } from 'src/entities/topic.entity';
 import { User } from 'src/entities/users.entity';
 import { EventService } from 'src/event/event.service';
@@ -145,7 +146,7 @@ export class TopicService {
 
         const updatedTopic = await this.topicRepo.findOneByOrFail({ idTopic: id });
         
-    
+
         return updatedTopic;
         
       } catch (error) {
@@ -258,4 +259,33 @@ export class TopicService {
           }
     }
     
+
+    async findOneByIdTopic(idTopic): Promise<Topic> {
+      return await this.topicRepo.findOneByOrFail({idTopic})
+    }
+
+    async findSubjectFollowIdTopic(idTopic) {
+      try {
+        const result =  await this.topicRepo.createQueryBuilder("topic")
+        .leftJoinAndSelect("topic.idSubject", "subject")
+        .where("topic.idTopic = :id", { id: idTopic })
+        .getOne();
+
+        return result.idSubject
+      } catch (error) {
+        
+      }
+    }
+
+    async getTopicFollowIdRequest(id) {
+        try {
+          return await this.topicRepo.createQueryBuilder("topic")
+                                     .leftJoinAndSelect("topic.request", 'request')
+                                     .where("request.codeRequest = :id", {id})
+                                     .getOne()
+
+        } catch (error) {
+          
+        }
+    }
 }

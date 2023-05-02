@@ -17,7 +17,7 @@ export class SubjectController {
     @Post('/create')
     @UsePipes(new ValidationPipe())
     @UseGuards(RolesGuard)
-    @Roles(Role.STUDENT)
+    @Roles(Role.ROLE_MANAGER)
     async createSubject(@Body() createSubject: CreateSubjectDto, @Req() req, @Res() res) {
          try {
             const currentUser = req.user
@@ -33,7 +33,7 @@ export class SubjectController {
     @Put('/update/:id')
     @UsePipes(new ValidationPipe())
     @UseGuards(RolesGuard)
-    @Roles(Role.STUDENT)
+    @Roles(Role.ROLE_TEACHER)
     async updateSubject(@Body()updateSubject: UpdateSubjectDto,@Param('id') id: number, @Req() req, @Res() res) {
          try {
             const currentUser = req.user
@@ -48,7 +48,7 @@ export class SubjectController {
 
     @Get('/get/genaral/info/:id')
     @UseGuards(RolesGuard)
-    @Roles(Role.STUDENT)
+    @Roles(Role.ROLE_MANAGER)
     async getGenaralInfo(@Param('id') id: number, @Req() req, @Res() res) {
          try {   
             const result =  await this.subjectService.getGenaralInfo(id)
@@ -62,7 +62,7 @@ export class SubjectController {
     @Post('/create/schedule/:id')
     @UseGuards(RolesGuard)
     @UsePipes(new ValidationPipe())
-    @Roles(Role.STUDENT)
+    @Roles(Role.ROLE_MANAGER)
     async createSchelude(@Param('id') id: number,@Body() createSchBody: CreateSchelude, @Req() req, @Res() res) {
          try {   
             const currentUser = req.user
@@ -77,7 +77,7 @@ export class SubjectController {
 
     @Post('/add/students/:id')
     @UseGuards(RolesGuard)
-    @Roles(Role.STUDENT)
+    @Roles(Role.ROLE_MANAGER)
     async addStudentsToSubject(@Param('id') idSubject: number,@Body() body: {idUsers: string[]}, @Req() req, @Res() res, @Next() next: NextFunction) {
          try {   
             const currentUser = req.user

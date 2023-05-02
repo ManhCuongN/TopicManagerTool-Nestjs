@@ -15,6 +15,7 @@ import { EventModule } from './event/event.module';
 import { DepartmentModule } from './department/department.module';
 import { SubjectQueueModule } from './subject-queue/subject-queue.module';
 import { GroupModule } from './group/group.module';
+import { RequestModule } from './request/request.module';
 
 
 @Module({
@@ -30,7 +31,8 @@ import { GroupModule } from './group/group.module';
     EventModule,
     DepartmentModule,
     SubjectQueueModule,
-    GroupModule
+    GroupModule,
+    RequestModule
 
   ],
 })
